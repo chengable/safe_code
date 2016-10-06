@@ -15,7 +15,7 @@ def check_ssrf(url):
       
     def is_inner_ipaddress(ip):    
         ip = ip2long(ip)    
-        return ip2long('128.0.0.0') >> 24 == ip >> 24 or \
+        return ip2long('127.0.0.0') >> 24 == ip >> 24 or \
                ip2long('10.0.0.0') >> 24 == ip >> 24 or \
                ip2long('172.16.0.0') >> 20 == ip >> 20 or \
                ip2long('192.168.0.0') >> 16 == ip >> 16    
@@ -54,12 +54,12 @@ def safe_request_url(url, **kwargs):
         succ, errstr = check_ssrf(url)
         if not succ:            
             print "SSRF Attack: %s" % (errstr)
-            return False
+            raise requests.exceptions.InvalidURL("SSRF Attack: %s" % (errstr, ))
          
     success, errstr = check_ssrf(url)    
     if not success:        
         print "SSRF Attack: %s" % (errstr)
-        return False    
+        raise requests.exceptions.InvalidURL("SSRF Attack: %s" % (errstr,))
          
     all_hooks = kwargs.get('hooks', dict())    
     if 'response' in all_hooks:        
